@@ -2,7 +2,7 @@
 Querying S3 Datalake filled with json files to create a relational database
 
 # Description
-In this project I have created an ETL Pipeline for an imaginary music streaming app Sparkify.
+In this project I have created an ETL Pipeline using Spark for an imaginary music streaming app Sparkify.
 First, I have extracted data from a DataLake which is located in Udacity public AWS S3 bucket "udacity-dend" containing multiple .json files. Json files were obtained from ["Million Song Dataset"](http://millionsongdataset.com/) and ["Music streaming app event simulator"](https://github.com/Interana/eventsim). 
 
 Then I used this data to create a star chema tables. Fact Table: **songplays**; Dimension Tables: **users**,**songs**, **artists**, **time**. These tables were then saved in form of structured parquet files making a Data Warehouse. This is of huge benefit for an imaginary music streaming app "Sparkify" due to following reasons:
