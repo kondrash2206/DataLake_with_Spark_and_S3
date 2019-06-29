@@ -35,18 +35,18 @@ def process_song_data(spark, input_data, output_data):
     
     # get filepath to song data file
     song_data = os.path.join(input_data, "song_data/*/*/*/*.json")
-
+    
     # read song data file
     df = spark.read.json(song_data)
 
     # extract columns to create songs table
-    songs_table = df.select('song_id','title','artist_id','year','duration')
+    songs_table = df.dropDuplicates(subset = ['song_id']).select('song_id','title','artist_id','year','duration')
     
     # write songs table to parquet files partitioned by year and artist
     songs_table.write.partitionBy('year','artist_id').parquet('{}songs/'.format(output_data))
     
     # extract columns to create artists table
-    artists_table = df.select('artist_id',col('artist_name').alias('name'),
+    artists_table = df.dropDuplicates(subset = ['artist_id']).select('artist_id',col('artist_name').alias('name'),
                          col('artist_location').alias('location'),
                          col('artist_latitude').alias('latitude'),
                          col('artist_longitude').alias('longitude')) 
@@ -63,7 +63,7 @@ def process_log_data(spark, input_data, output_data):
 
     # get filepath to log data file
     log_data = os.path.join(input_data, "log-data/*/*/*.json")
-
+    
     # read log data file
     df = spark.read.json(log_data)
     
@@ -85,7 +85,7 @@ def process_log_data(spark, input_data, output_data):
     df = df.withColumn('date',F.from_unixtime(col('ts')/1000, "yyyy-MM-dd HH:mm:ss"))
     
     # extract columns to create time table
-    time_table = df.select(col('ts').alias('start_time'), \
+    time_table = df.dropDuplicates(subset = ['ts']).select(col('ts').alias('start_time'), \
                            F.hour(df.date).alias('hour'),\
                            F.dayofmonth(df.date).alias('day'), \
                            F.weekofyear(df.date).alias('week'), \
@@ -136,6 +136,7 @@ def main():
     spark = create_spark_session()
     input_data = "s3a://udacity-dend/"
     output_data = "s3a://udacity-spark-parquet/"
+    
     process_song_data(spark, input_data, output_data)    
     process_log_data(spark, input_data, output_data)
 
